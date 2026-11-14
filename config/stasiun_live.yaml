@@ -1,0 +1,26 @@
+# Metadata stasiun untuk mode live (rtkrcv). Sumber: nrtk.big.go.id, tab Hardware, dicek 13 Nov 2026.
+# Koordinat tetap diambil dari hasil PPP statik kita (pipeline/gnss/konfig), bukan dari popup nrtk yang dibulatkan.
+# Catatan: header RINEX 2.11 SRGI tidak mencantumkan kubah antena (radome), jadi olahan historis CKRG dan BAKO
+# memakai NONE. Uji 10 hari (DOY 290-299): selisih ZTD SCIS-NONE CKRG 0,6 +/- 0,3 mm, LEIM-NONE BAKO -0,3 +/- 0,4 mm
+# (sekitar 0,1 mm PWV), jadi data historis tidak perlu diolah ulang.
+stasiun:
+  ckrg:
+    rtcm_id: 406
+    receiver: TRIMBLE ALLOY (firmware 6.21)
+    antena: "TRM159900.00    SCIS"
+    tinggi_antena_m: 0.000
+  bako:
+    rtcm_id: 31
+    receiver: LEICA GR50 (firmware 4.31)
+    antena: "LEIAR20         LEIM"
+    tinggi_antena_m: 1.648
+  clbg:
+    rtcm_id: 36
+    receiver: LEICA GR50 (firmware 4.20)
+    antena: "LEIAT504GG      LEIS"
+    tinggi_antena_m: 0.008
+  cjur:
+    rtcm_id: 168
+    receiver: TRIMBLE ALLOY (firmware 6.50)
+    antena: "TRM159900.00    SCIS"
+    tinggi_antena_m: 0.000

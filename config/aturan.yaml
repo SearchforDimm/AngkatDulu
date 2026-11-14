@@ -1,0 +1,46 @@
+# Aturan peringatan AngkatDulu. Ditulis oleh pipeline/evaluasi/kalibrasi.py; dibaca mesin (PenilaiAturan).
+# Celah ERA5 28–31 Okt diisi (pipeline/pwv/pwv.py, galat PWV rata-rata 0,26 mm). Level 1 belum dikalibrasi terpisah.
+nama: persentil-80
+versi: 1.2.0
+dibuat: '2026-11-09'
+fitur:
+  jendela_acuan_hari: 15
+  min_hari_acuan: 3
+  reset_acuan:
+    CJUR: '2026-09-24T00:00:00Z'
+level2:
+  jenis: persentil
+  min: 80
+  delta3j_min_mm: null
+  padam_setelah_menit: 60
+level1:
+  jenis: persentil
+  min: 65
+tanpa_data_setelah_menit: 120
+notifikasi:
+  jam_mulai_wib: 06:00
+  jam_selesai_wib: '18:00'
+  maks_per_hari: 2
+  kuota_mencakup:
+  - BERPOTENSI
+  - AMAN_LAGI
+  tanya_hujan_setelah_menit: 90
+  aman_lagi_sampai_wib: '15:00'
+kalibrasi:
+  data: CKRG, BAKO, CLBG, CJUR; 1 Sep–1 Nov 2026; ERA5 1 Sep–28 Okt 09 UTC dan 1–3
+    Nov; 28 Okt 10 UTC–31 Okt 23 UTC diisi pola harian + anomali antar-tepi (METEO_ISI)
+  sasaran: HSS P-3J tertinggi (hujan IMERG >= 1 mm/jam dalam 3 jam, keputusan 06.00–17.30
+    WIB)
+  skor_uji_silang_per_stasiun:
+    HSS: 0.32
+    POD: 0.54
+    FAR: 0.61
+    nyala: 0.23
+    E3J: 16/66
+    tercakup: 23/66
+    kirim_per_hari: 0.44
+  pembanding_HSS:
+    bl_pola_harian: 0.18
+    bl_persistensi: 0.4
+    ambang_45: 0.25
+  rincian: data/evaluasi/validasi.csv

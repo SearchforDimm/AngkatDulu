@@ -1,0 +1,43 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Inter, Arial','fontSize':'15px','primaryTextColor':'#1f1f1e','lineColor':'#8a8980','edgeLabelBackground':'#ffffff'}}}%%
+flowchart TD
+  subgraph S1["A · DATA &amp; PENGOLAHAN"]
+    A["<b>1. Kumpulkan data</b><br/>RINEX, orbit/jam, IMERG, ERA5<br/><i>sebagian:</i> CLDO, CLBG + ERA5 28 Okt–1 Nov menyusul"]
+    B["<b>2. GNSS → ZTD</b><br/>PPP 26 jam per hari<br/><i>sebagian:</i> CKRG, BAKO selesai"]
+    C["<b>3. ZTD → PWV 30 menit</b><br/>ERA5 + Saastamoinen + Bevis<br/><i>sebagian:</i> CKRG, BAKO selesai"]
+    D["<b>4. Hujan &amp; awal hujan</b><br/>IMERG → hujan_30menit, awal_hujan<br/><i>belum, bisa mulai sekarang</i>"]
+  end
+  subgraph S2["B · ATURAN &amp; PROPOSAL"]
+    E["<b>5. Kalibrasi &amp; evaluasi</b><br/>atur di September, uji di Oktober,<br/>uji silang stasiun → aturan.yaml v1<br/><i>belum, bisa mulai sekarang</i>"]
+    F["<b>6. Perbarui angka proposal</b><br/>ringkasan_angka → docx<br/><i>belum, batas 10 Nov</i>"]
+  end
+  subgraph S3["C · SISTEM"]
+    G["<b>7. Database</b><br/>skema.sql + impor CSV<br/><i>sebagian:</i> skema siap"]
+    H["<b>8. Mesin peringatan (replay)</b><br/>jam simulasi, fitur kausal, status,<br/>kebijakan pesan, penjadwal<br/><i>belum, bisa mulai sekarang</i>"]
+    I["<b>9. Bot Telegram</b><br/>daftar, lokasi, peringatan,<br/>ringkasan pagi, 'Tadi hujan?'<br/><i>belum, butuh token bot</i>"]
+    J["<b>10. Dashboard offline</b><br/>kendali replay, grafik PWV,<br/>log pesan, panel skill<br/><i>belum</i>"]
+  end
+  subgraph S4["D · DEMO"]
+    K["<b>11. Uji ujung-ke-ujung</b><br/>replay 27 Okt, tanpa internet,<br/>0 pelanggaran kebijakan pesan<br/><i>belum</i>"]
+    L["<b>12. Demo Day</b><br/>±19 Nov"]
+    M["<b>Lanjutan: mode live</b><br/>feed SRGI / PPP real-time<br/><i>belum, tanya akses di TM 12–13 Nov</i>"]
+  end
+  A --> B --> C --> E
+  A --> D --> E
+  E --> F
+  C --> G
+  D --> G
+  E -- "aturan.yaml" --> H
+  G --> H --> I --> K
+  H --> J --> K
+  K --> L
+  L -.-> M
+  classDef jalan fill:#fdf0d5,stroke:#c98500,stroke-width:1.5px
+  classDef belum fill:#ffffff,stroke:#8a8980,stroke-width:1.2px
+  classDef tujuan fill:#e3eefb,stroke:#2a78d6,stroke-width:1.5px
+  class A,B,C,G jalan
+  class D,E,H,I,J,K,M belum
+  class F,L tujuan
+  style S1 fill:#f7f6f2,stroke:#d6d5ce
+  style S2 fill:#f7f6f2,stroke:#d6d5ce
+  style S3 fill:#f7f6f2,stroke:#d6d5ce
+  style S4 fill:#f7f6f2,stroke:#d6d5ce

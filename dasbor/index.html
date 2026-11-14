@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AngkatDulu · Dashboard</title>
+<style>
+:root {
+  --latar: #e6e8e3;          /* lantai jemur semen */
+  --panel: #ffffff;
+  --garis: #d2d5cd;
+  --grid: #e7e9e3;
+  --sumbu: #b7bbb1;
+  --tinta: #17201a;
+  --tinta-2: #4b544d;
+  --tinta-3: #6f776f;
+  --terpal: #2a78d6;         /* biru terpal: seri PWV dan tombol */
+  --terpal-gelap: #1d5fae;
+  --hujan: #66707a;
+  --aman: #0ca30c;    --aman-muda: #e3f3e0;
+  --waspada: #fab219; --waspada-muda: #fdf0cf;
+  --potensi: #d03b3b; --potensi-muda: #f9e3e1;
+  --tanpa: #8b908a;   --tanpa-muda: #eceeea;
+  --malam: #f1f2ee;
+  --tampil: Bahnschrift, "DIN Alternate", "DIN 2014", "Barlow", "Segoe UI", system-ui, sans-serif;
+  --teks: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--latar); color: var(--tinta); font: 15px/1.45 var(--teks);
+  display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; min-height: 100vh;
+  font-variant-numeric: tabular-nums;
+}
+button, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--terpal); outline-offset: 2px; }
+
+/* ---------- kepala ---------- */
+.kepala { display: flex; align-items: center; gap: 18px; padding: 12px 24px; flex-wrap: wrap; }
+.merek { display: flex; align-items: center; gap: 10px; font: 700 22px/1 var(--tampil); letter-spacing: -0.01em; }
+.merek svg { width: 30px; height: 30px; }
+.sub { margin: 0; color: var(--tinta-2); font-size: 14px; }
+.replay { border: 1.5px solid var(--tinta); border-radius: 999px; padding: 3px 12px; font-size: 13px; font-weight: 600; }
+.ruang { flex: 1; }
+.hp { color: var(--tinta-2); font-size: 13px; text-align: right; line-height: 1.3; }
+.hp b { color: var(--tinta); }
+.kendali { display: flex; align-items: center; gap: 10px; }
+.tombol {
+  border: 0; border-radius: 8px; padding: 9px 18px; font-weight: 650; background: var(--terpal); color: #fff;
+  cursor: pointer; min-width: 148px;
+}
+.tombol:hover:not(:disabled) { background: var(--terpal-gelap); }
+.tombol:disabled { background: #c9ccc4; color: var(--tinta-2); cursor: default; }
+.tombol.sekunder { background: var(--panel); color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--tinta); }
+.tombol.sekunder:hover:not(:disabled) { background: var(--malam); }
+.kecepatan { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--tinta-2); }
+.kecepatan select { border: 1.5px solid var(--garis); border-radius: 8px; padding: 7px 8px; background: var(--panel); }
+
+/* ---------- baris jam dan status ---------- */
+.pahlawan { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; padding: 0 24px 14px; }
+.jam { background: var(--tinta); color: #fff; border-radius: 14px; padding: 12px 22px 12px; min-width: 300px; }
+.jam-angka { font: 600 72px/0.95 var(--tampil); font-stretch: 87.5%; letter-spacing: -0.02em; }
+.jam-angka small { font-size: 22px; font-weight: 400; margin-left: 6px; letter-spacing: 0; }
+.jam-tgl { font-size: 14px; opacity: .85; margin-top: 4px; }
+.kemajuan { margin-top: 10px; display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center;
+  font-size: 12px; opacity: .9; }
+.rel { height: 6px; background: rgba(255,255,255,.22); border-radius: 3px; overflow: hidden; }
+.rel i { display: block; height: 100%; width: 0; background: #fff; border-radius: 3px; transition: width .4s linear; }
+
+.kini {
+  border-radius: 14px; padding: 16px 24px 16px 20px; display: flex; gap: 18px; align-items: center;
+  background: var(--panel); border-left: 12px solid var(--tanpa); min-height: 100%;
+}
+.kini svg.ikon { width: 64px; height: 64px; flex: none; }
+.kini h1 { margin: 0; font: 650 38px/1.05 var(--tampil); letter-spacing: -0.01em; }
+.kini p { margin: 6px 0 0; color: var(--tinta-2); font-size: 16px; max-width: 75ch; }
+.kini.lv-AMAN { background: var(--aman-muda); border-left-color: var(--aman); }
+.kini.lv-WASPADA { background: var(--waspada-muda); border-left-color: var(--waspada); }
+.kini.lv-BERPOTENSI { background: var(--potensi-muda); border-left-color: var(--potensi); }
+.kini.lv-TANPA_DATA { background: var(--tanpa-muda); border-left-color: var(--tanpa); }
+.kini.fase { border-left-color: var(--terpal); }
+
+/* ---------- isi ---------- */
+.isi {
+  display: grid; gap: 16px; padding: 0 24px; min-height: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 27vw);
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas: "grafik pesan" "stasiun pesan";
+}
+.panel { background: var(--panel); border: 1px solid var(--garis); border-radius: 12px; }
+.panel h2 { margin: 0; font: 650 18px/1.2 var(--tampil); }
+
+.p-grafik { grid-area: grafik; display: flex; flex-direction: column; padding: 14px 16px 8px; min-height: 340px; }
+.p-grafik header { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; }
+.legenda { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--tinta-2); margin: 0; padding: 0;
+  list-style: none; }
+.legenda li { display: flex; align-items: center; gap: 6px; }
+.legenda svg { width: 22px; height: 12px; }
+.wadah { position: relative; flex: 1; min-height: 240px; margin-top: 6px; }
+#grafik { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.tip {
+  position: absolute; pointer-events: none; background: var(--tinta); color: #fff; border-radius: 8px;
+  padding: 8px 11px; font-size: 12.5px; line-height: 1.45; white-space: nowrap; display: none; z-index: 2;
+}
+.tip b { font-size: 13.5px; }
+.kosong { position: absolute; inset: 0; display: grid; place-items: center; color: var(--tinta-3); text-align: center;
+  padding: 24px; }
+
+.p-stasiun { grid-area: stasiun; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.ubin {
+  text-align: left; background: var(--panel); border: 1px solid var(--garis); border-radius: 12px; cursor: pointer;
+  padding: 10px 12px 10px 14px; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: center;
+  border-left: 6px solid var(--tanpa); position: relative;
+}
+.ubin:hover { background: #fafbf8; }
+.ubin[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--tinta); }
+.ubin svg { width: 30px; height: 30px; grid-row: span 2; }
+.ubin .nama { font: 650 16px/1.15 var(--tampil); }
+.ubin .nama span { font-weight: 400; color: var(--tinta-2); }
+.ubin .lv { font-size: 14px; font-weight: 600; }
+.ubin .rinci { grid-column: 1 / -1; font-size: 12.5px; color: var(--tinta-2); margin-top: 4px; }
+.ubin.lv-AMAN { border-left-color: var(--aman); }
+.ubin.lv-WASPADA { border-left-color: var(--waspada); }
+.ubin.lv-BERPOTENSI { border-left-color: var(--potensi); }
+
+.p-pesan { grid-area: pesan; display: flex; flex-direction: column; min-height: 0; }
+.p-pesan > header { padding: 14px 16px 10px; border-bottom: 1px solid var(--grid); }
+.p-pesan > header p { margin: 2px 0 0; font-size: 13px; color: var(--tinta-2); }
+.log { list-style: none; margin: 0; padding: 4px 0; overflow-y: auto; flex: 1; min-height: 120px; }
+.msg { display: grid; grid-template-columns: 52px 1fr; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--grid); }
+.msg time { font: 600 17px/1.2 var(--tampil); }
+.msg .judul { margin: 0; font-weight: 650; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.msg .isi-pesan { margin: 3px 0 0; color: var(--tinta-2); font-size: 13.5px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.msg .jawab { margin: 5px 0 0; font-size: 13px; font-weight: 600; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; border-radius: 999px;
+  padding: 1px 9px 1px 7px; background: var(--malam); color: var(--tinta-2); }
+.chip svg { width: 13px; height: 13px; }
+.chip.bunyi { background: var(--tinta); color: #fff; }
+.chip.tahan { background: #fff; box-shadow: inset 0 0 0 1.5px var(--tinta-2); color: var(--tinta); }
+.chip.gagal { background: var(--potensi); color: #fff; }
+.msg.s-DITAHAN time, .msg.s-DITAHAN .judul { color: var(--tinta-3); }
+.msg.s-DIJADWALKAN { opacity: .62; }
+.msg .alasan { margin: 4px 0 0; font-size: 13px; color: var(--tinta); }
+.msg.baru { animation: sorot 1.6s ease-out; }
+@keyframes sorot { from { background: #fff3c4; } to { background: transparent; } }
+.log .kosong-log { padding: 18px 16px; color: var(--tinta-3); font-size: 14px; }
+.rekam { padding: 12px 16px 14px; border-top: 1px solid var(--grid); }
+.rekam h3 { margin: 0 0 6px; font: 650 15px/1.2 var(--tampil); }
+.rekam p { margin: 6px 0 0; font-size: 13px; color: var(--tinta-2); }
+.kotak { display: flex; flex-wrap: wrap; gap: 2.5px; }
+.kotak i { width: 10px; height: 10px; border-radius: 2.5px; box-shadow: inset 0 0 0 1.5px var(--terpal); }
+.kotak i.ya { background: var(--terpal); }
+
+.kaki { padding: 10px 24px 12px; font-size: 12px; color: var(--tinta-2); }
+.kaki p { margin: 0; max-width: 170ch; }
+.putus { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); background: var(--potensi); color: #fff;
+  padding: 8px 14px; border-radius: 8px; font-weight: 600; display: none; }
+
+@media (max-width: 1500px) { .sub { display: none; } }
+@media (max-height: 860px) {
+  .kepala { padding: 8px 20px; }
+  .pahlawan { padding: 0 20px 10px; gap: 12px; }
+  .jam { padding: 8px 18px; min-width: 240px; }
+  .jam-angka { font-size: 52px; }
+  .jam-angka small { font-size: 18px; }
+  .kemajuan { margin-top: 6px; }
+  .kini { padding: 10px 18px 10px 16px; gap: 14px; border-left-width: 10px; }
+  .kini svg.ikon { width: 48px; height: 48px; }
+  .kini h1 { font-size: 30px; }
+  .kini p { font-size: 14.5px; margin-top: 3px; }
+  .isi { padding: 0 20px; gap: 12px; }
+  .p-grafik { padding: 10px 14px 6px; min-height: 300px; }
+  .ubin { padding: 8px 10px 8px 12px; }
+  .ubin .rinci { margin-top: 2px; font-size: 12px; }
+  .p-pesan > header { padding: 10px 14px 8px; }
+  .msg { padding: 8px 14px; }
+  .rekam { padding: 10px 14px 10px; }
+  .kaki { padding: 6px 20px 8px; font-size: 11px; }
+}
+@media (max-width: 1100px) {
+  body { display: block; }
+  .pahlawan { grid-template-columns: 1fr; }
+  .isi { grid-template-columns: 1fr; grid-template-areas: "grafik" "stasiun" "pesan"; grid-template-rows: auto; }
+  .p-grafik { min-height: 460px; }
+  .p-stasiun { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .log { max-height: 60vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .msg.baru { animation: none; }
+  .rel i { transition: none; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-AMAN" viewBox="0 0 32 32"><circle cx="16" cy="16" r="6.5" fill="var(--aman)"/>
+      <g stroke="var(--aman)" stroke-width="2.4" stroke-linecap="round"><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M6.8 25.2l2.8-2.8M22.4 9.6l2.8-2.8"/></g></symbol>
+    <symbol id="i-WASPADA" viewBox="0 0 32 32"><path d="M9 24h14.5a5.5 5.5 0 0 0 .6-11A8 8 0 0 0 8.7 14.6 4.8 4.8 0 0 0 9 24z" fill="var(--waspada)"/></symbol>
+    <symbol id="i-BERPOTENSI" viewBox="0 0 32 32"><path d="M9 19h14.5a5.5 5.5 0 0 0 .6-11A8 8 0 0 0 8.7 9.6 4.8 4.8 0 0 0 9 19z" fill="var(--potensi)"/>
+      <g stroke="var(--potensi)" stroke-width="2.4" stroke-linecap="round"><path d="M11 23l-1.5 4M17 23l-1.5 4M23 23l-1.5 4"/></g></symbol>
+    <symbol id="i-TANPA_DATA" viewBox="0 0 32 32"><circle cx="16" cy="16" r="11" fill="none" stroke="var(--tanpa)" stroke-width="2.6" stroke-dasharray="4 3.2"/>
+      <path d="M8 24L24 8" stroke="var(--tanpa)" stroke-width="2.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-HP" viewBox="0 0 32 32"><rect x="9" y="3" width="14" height="26" rx="3" fill="none" stroke="var(--terpal)" stroke-width="2.4"/>
+      <circle cx="16" cy="24.5" r="1.6" fill="var(--terpal)"/></symbol>
+    <symbol id="i-SIAP" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="var(--terpal)"/><path d="M13 10.5v11l9-5.5z" fill="#fff"/></symbol>
+    <symbol id="i-PANAS" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="none" stroke="var(--terpal)" stroke-width="2.6" stroke-opacity=".25"/>
+      <path d="M16 4a12 12 0 0 1 12 12" fill="none" stroke="var(--terpal)" stroke-width="2.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-bel" viewBox="0 0 16 16"><path d="M8 1.8a4 4 0 0 0-4 4v2.6L2.6 11h10.8L12 8.4V5.8a4 4 0 0 0-4-4zM6.3 12.6a1.8 1.8 0 0 0 3.4 0z" fill="currentColor"/></symbol>
+    <symbol id="i-senyap" viewBox="0 0 16 16"><path d="M8 1.8a4 4 0 0 0-4 4v2.6L2.6 11h10.8L12 8.4V5.8a4 4 0 0 0-4-4zM6.3 12.6a1.8 1.8 0 0 0 3.4 0z" fill="currentColor" opacity=".55"/>
+      <path d="M2.5 2.5l11 11" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-tahan" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.8 12.2l8.4-8.4" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-jadwal" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.5V8l2.5 1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <pattern id="arsir-tanpa" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="6" height="6" fill="var(--tanpa-muda)"/><line x1="0" y1="0" x2="0" y2="6" stroke="#c9ccc5" stroke-width="2"/></pattern>
+  </defs>
+</svg>
+
+<header class="kepala">
+  <div class="merek">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 21l13-10 13 10" fill="none" stroke="var(--terpal)" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M8 26h16" stroke="#c99a2e" stroke-width="3.4" stroke-linecap="round"/></svg>
+    AngkatDulu
+  </div>
+  <p class="sub">Peringatan hujan dari uap air di atas stasiun GNSS Ina-CORS</p>
+  <span class="replay" id="lencana">Replay</span>
+  <span class="ruang"></span>
+  <div class="hp" id="hp"></div>
+  <div class="kendali">
+    <button class="tombol" id="utama" disabled>Menunggu HP</button>
+    <label class="kecepatan">Kecepatan
+      <select id="kecepatan" aria-label="Kecepatan replay"></select>
+    </label>
+  </div>
+</header>
+
+<section class="pahlawan">
+  <div class="jam" aria-live="off">
+    <div class="jam-angka" id="jam">--.--<small>WIB</small></div>
+    <div class="jam-tgl" id="tanggal">Jam simulasi replay</div>
+    <div class="kemajuan"><span id="awal-label">05.00</span><span class="rel"><i id="rel"></i></span><span id="akhir-label">20.00</span></div>
+  </div>
+  <div class="kini fase" id="kini" aria-live="polite">
+    <svg class="ikon"><use href="#i-HP"/></svg>
+    <div><h1>Menyambung ke mesin</h1><p>Halaman ini membaca angkatdulu.db di laptop ini.</p></div>
+  </div>
+</section>
+
+<main class="isi">
+  <section class="panel p-grafik" aria-labelledby="judul-grafik">
+    <header>
+      <h2 id="judul-grafik">Uap air di atas stasiun</h2>
+      <ul class="legenda" aria-label="Keterangan grafik">
+        <li><svg viewBox="0 0 22 12"><path d="M1 6h20" stroke="var(--terpal)" stroke-width="2.5"/></svg>PWV 1 jam</li>
+        <li><svg viewBox="0 0 22 12"><path d="M1 6h20" stroke="var(--potensi)" stroke-width="2" stroke-dasharray="5 3"/></svg>batas berpotensi</li>
+        <li><svg viewBox="0 0 22 12"><path d="M1 6h20" stroke="#b9820a" stroke-width="2" stroke-dasharray="2 3"/></svg>batas waspada</li>
+        <li><svg viewBox="0 0 22 12"><rect x="1" y="1" width="20" height="10" rx="2" fill="var(--potensi-muda)"/></svg>status berpotensi</li>
+        <li><svg viewBox="0 0 22 12"><rect x="1" y="1" width="20" height="10" rx="2" fill="var(--waspada-muda)"/></svg>status waspada</li>
+        <li><svg viewBox="0 0 22 12"><rect x="1" y="1" width="20" height="10" rx="2" fill="var(--malam)" stroke="#d9dbd5"/></svg>di luar jam jemur</li>
+        <li><svg viewBox="0 0 22 12"><rect x="7" y="2" width="8" height="9" rx="1.5" fill="var(--hujan)"/></svg>hujan IMERG</li>
+      </ul>
+    </header>
+    <div class="wadah" id="wadah">
+      <svg id="grafik" role="img" aria-label="Grafik PWV dan hujan"></svg>
+      <div class="tip" id="tip"></div>
+      <div class="kosong" id="kosong">Grafik muncul setelah mesin selesai dipanaskan.</div>
+    </div>
+  </section>
+
+  <section class="p-stasiun" id="stasiun" aria-label="Status empat stasiun"></section>
+
+  <aside class="panel p-pesan" aria-labelledby="judul-pesan">
+    <header>
+      <h2 id="judul-pesan">Pesan ke HP Bu Sri</h2>
+      <p id="aturan-ringkas">Notifikasi berbunyi hanya 06.00–18.00, paling banyak 2 per hari.</p>
+    </header>
+    <ol class="log" id="log"><li class="kosong-log">Belum ada pesan di sesi ini.</li></ol>
+    <div class="rekam" id="rekam">
+      <h3>Rekam jejak 30 hari</h3>
+      <div class="kotak" id="kotak"></div>
+      <p id="rekam-teks">Dihitung saat replay berjalan.</p>
+    </div>
+  </aside>
+</main>
+
+<footer class="kaki"><p id="kaki">PWV dari pengolahan PPP (RTKLIB-EX) atas data Ina-CORS BIG, tiap 30 menit. Hujan dari GPM IMERG Late V07 di sel tepat di atas stasiun, hanya untuk pembanding.</p></footer>
+<div class="putus" id="putus" role="status">Sambungan ke mesin terputus. Pastikan demo_bot.py masih jalan.</div>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const NS = 'http://www.w3.org/2000/svg';
+const LEVEL = {
+  AMAN: { judul: 'Aman menjemur', ubin: 'Aman' },
+  WASPADA: { judul: 'Waspada: udara lembap', ubin: 'Waspada' },
+  BERPOTENSI: { judul: 'Berpotensi hujan dalam 3 jam', ubin: 'Berpotensi hujan' },
+  TANPA_DATA: { judul: 'Data stasiun terputus', ubin: 'Tanpa data' },
+};
+const SARAN = {
+  AMAN: 'Udara relatif kering. Jemuran boleh tetap di luar.',
+  WASPADA: 'Udara lebih lembap dari biasanya. Jemur dekat terpal.',
+  BERPOTENSI: 'Siapkan terpal atau angkat jemuran.',
+  TANPA_DATA: 'Mesin tidak menebak saat data stasiun putus.',
+};
+const JENIS = { RINGKASAN_PAGI: 'Ringkasan pagi', BERPOTENSI: 'Berpotensi hujan', AMAN_LAGI: 'Aman menjemur lagi',
+  TANYA_HUJAN: 'Tadi hujan?', STATUS: 'Status' };
+const JAWAB = { YA: 'Hujan', TIDAK: 'Tidak hujan' };
+
+let kodePilih = null;
+try { kodePilih = localStorage.getItem('angkatdulu.kode'); } catch (e) { /* tanpa penyimpanan */ }
+let data = null, sudahLihat = new Set(), pertama = true, hoverX = null, sibuk = false;
+
+const angka = (v, d = 1) => v == null ? '–' : Number(v).toLocaleString('id-ID', { minimumFractionDigits: d, maximumFractionDigits: d });
+const jamLabel = (h) => { const j = Math.floor(h), m = Math.round((h - j) * 60); return `${String(j).padStart(2, '0')}.${String(m).padStart(2, '0')}`; };
+const ms = (s) => Date.parse(s);
+const WIB = 7 * 3600e3;
+const jamWib = (t) => { const d = new Date(t + WIB); return `${String(d.getUTCHours()).padStart(2, '0')}.${String(d.getUTCMinutes()).padStart(2, '0')}`; };
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function jarakKm(a, b) {
+  const R = 6371, r = Math.PI / 180;
+  const dLa = (b.lat - a.lat) * r, dLo = (b.lon - a.lon) * r;
+  const h = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLo / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function ikon(nama, cls = 'ikon') { return `<svg class="${cls}" aria-hidden="true"><use href="#i-${nama}"/></svg>`; }
+
+// ------------------------------------------------------------------ kendali
+async function kirim(aksi, nilai) {
+  try {
+    await fetch('/api/kendali', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ aksi, nilai }) });
+  } catch (e) { /* tampil di poll berikutnya */ }
+  muat();
+}
+$('utama').addEventListener('click', () => {
+  const k = data && data.kendali; if (!k) return;
+  if (k.fase === 'SIAP' || k.fase === 'SELESAI') kirim('mulai');
+  else if (k.fase === 'BERJALAN') kirim(k.jeda ? 'lanjut' : 'jeda');
+});
+$('kecepatan').addEventListener('change', (e) => kirim('kecepatan', Number(e.target.value)));
+
+// ------------------------------------------------------------------ kepala, jam, status kini
+function gambarKepala(d) {
+  const k = d.kendali, a = d.aturan;
+  $('lencana').textContent = `Replay data ${k.tanggal_replay.split(', ').pop()}`;
+  $('lencana').title = 'Data historis diputar ulang; pesan di HP diberi label [REPLAY]';
+  $('hp').innerHTML = k.bot ? `Bot <b>@${k.bot}</b><br>${k.n_hp} HP terdaftar` : 'Mode tanpa bot<br>pesan hanya di panel ini';
+  const b = $('utama');
+  const label = { MENUNGGU_HP: 'Menunggu HP', PEMANASAN: 'Menyiapkan…', SIAP: 'Mulai replay',
+    BERJALAN: k.jeda ? 'Lanjutkan' : 'Jeda', SELESAI: 'Putar ulang' }[k.fase] || '…';
+  b.textContent = label;
+  b.disabled = k.fase === 'MENUNGGU_HP' || k.fase === 'PEMANASAN';
+  b.classList.toggle('sekunder', k.fase === 'BERJALAN' && !k.jeda);
+  const sel = $('kecepatan');
+  const pilihan = [...new Set([...k.kecepatan, k.detik_per_tick])].sort((a, b) => a - b);
+  if (sel.options.length !== pilihan.length) {
+    sel.innerHTML = '';
+    for (const v of pilihan) sel.add(new Option(`30 menit tiap ${angka(v, v % 1 ? 1 : 0)} detik`, v));
+  }
+  if (document.activeElement !== sel) sel.value = String(k.detik_per_tick);
+
+  $('jam').innerHTML = `${k.jam || '--.--'}<small>WIB</small>`;
+  $('tanggal').textContent = k.tanggal || 'Jam simulasi replay';
+  $('awal-label').textContent = jamWib(ms(k.mulai)); $('akhir-label').textContent = jamWib(ms(k.selesai));
+  const f = k.tau ? Math.min(1, Math.max(0, (ms(k.tau) - ms(k.mulai)) / (ms(k.selesai) - ms(k.mulai)))) : 0;
+  $('rel').style.width = `${(f * 100).toFixed(1)}%`;
+  $('aturan-ringkas').textContent =
+    `Notifikasi berbunyi hanya ${jamLabel(a.jam_mulai)}–${jamLabel(a.jam_selesai)}, paling banyak ${a.maks_per_hari} per hari. ` +
+    `"Aman lagi" tidak dikirim sesudah ${jamLabel(a.aman_lagi_sampai)}.`;
+  $('kaki').textContent = `PWV dari pengolahan PPP (RTKLIB-EX) atas data Ina-CORS BIG, tiap 30 menit. ` +
+    `Aturan ${a.nama} v${a.versi}: berpotensi bila PWV 1 jam di atas persentil ${a.l2} dari ${a.jendela_hari} hari terakhir, ` +
+    `waspada di atas persentil ${a.l1}. Hujan dari GPM IMERG Late V07 di sel tepat di atas stasiun, hanya untuk pembanding.`;
+}
+
+function gambarKini(d) {
+  const k = d.kendali, box = $('kini');
+  const st = d.stasiun.find((s) => s.kode === k.kode) || {};
+  let lv = null, ik, h, p;
+  if (k.fase === 'MENUNGGU_HP') {
+    ik = 'HP'; h = 'Menunggu HP Bu Sri mendaftar';
+    p = k.bot ? `Buka t.me/${k.bot} di HP, tekan Start, lalu kirim lokasi.` : 'Menyiapkan mesin.';
+  } else if (k.fase === 'PEMANASAN') {
+    ik = 'PANAS'; h = 'Menyiapkan mesin';
+    p = `Membaca ${k.pemanasan_hari || 30} hari data sebelum ${k.mulai_label} supaya ambang persentil dan rekam jejak terisi. Sekitar satu menit.`;
+  } else if (k.fase === 'SIAP') {
+    ik = 'SIAP'; h = 'Siap diputar';
+    p = `Tekan Mulai replay. Jam simulasi maju 30 menit tiap ${angka(k.detik_per_tick, k.detik_per_tick % 1 ? 1 : 0)} detik, dari ${k.mulai_label} sampai ${k.selesai_label}. Data yang dipakai mesin hanya yang sudah ada pada jam simulasi.`;
+  } else {
+    lv = st.level || 'TANPA_DATA'; ik = lv; h = LEVEL[lv].judul;
+    const jarak = d.pengguna ? `±${angka(d.pengguna.jarak_km, 0)} km dari titik jemur Bu Sri` : '';
+    const pwv = st.pwv != null ? ` PWV 1 jam ${angka(st.pwv)} mm, persentil ${angka(st.persentil, 0)} dari ${d.aturan.jendela_hari} hari terakhir.` : '';
+    p = `${SARAN[lv]} Stasiun ${st.kode} ${st.nama}${jarak ? ', ' + jarak : ''}.${pwv}`;
+    if (k.fase === 'SELESAI') p = `Replay selesai. ${p}`;
+    else if (k.jeda) p = `Replay dijeda. ${p}`;
+  }
+  box.className = 'kini' + (lv ? ` lv-${lv}` : ' fase');
+  box.innerHTML = `${ikon(ik)}<div><h1>${h}</h1><p>${p}</p></div>`;
+}
+
+// ------------------------------------------------------------------ ubin stasiun
+function gambarStasiun(d) {
+  const wadah = $('stasiun');
+  const kode = d.grafik ? d.grafik.kode : (kodePilih || d.kendali.kode);
+  wadah.innerHTML = '';
+  for (const s of d.stasiun) {
+    const lv = s.level || 'TANPA_DATA';
+    const b = document.createElement('button');
+    b.className = `ubin lv-${s.level ? lv : 'kosong'}`;
+    b.setAttribute('aria-pressed', String(s.kode === kode));
+    const jarak = d.pengguna ? jarakKm(d.pengguna, s) : null;
+    const rinci = s.pwv != null ? `PWV ${angka(s.pwv)} mm, persentil ${angka(s.persentil, 0)}` : (s.level ? 'Data terputus' : 'Menunggu replay');
+    b.innerHTML = `${ikon(lv, '')}<span class="nama">${s.kode} <span>${s.nama}</span></span>` +
+      `<span class="lv">${s.level ? LEVEL[lv].ubin : '–'}</span>` +
+      `<span class="rinci">${rinci}${jarak != null ? `<br>±${angka(jarak, 0)} km dari titik jemur` : ''}</span>` +
+      '';
+    b.title = `Tampilkan ${s.kode} di grafik`;
+    b.addEventListener('click', () => {
+      kodePilih = s.kode;
+      try { localStorage.setItem('angkatdulu.kode', s.kode); } catch (e) { /* abaikan */ }
+      muat();
+    });
+    wadah.appendChild(b);
+  }
+}
+
+// ------------------------------------------------------------------ log pesan
+const ALASAN = (a, at) => ({
+  DI_LUAR_JAM: `Di luar jam ${jamLabel(at.jam_mulai)}–${jamLabel(at.jam_selesai)}: notifikasi tidak dikirim malam hari.`,
+  LEWAT_JAM_JEMUR: `Lewat ${jamLabel(at.aman_lagi_sampai)}: tidak menyuruh menjemur menjelang sore.`,
+  KUOTA_HARIAN: `Sudah ${at.maks_per_hari} notifikasi hari ini.`,
+}[a] || a);
+
+function gambarPesan(d) {
+  const ol = $('log');
+  if (!d.pesan.length) {
+    ol.innerHTML = `<li class="kosong-log">${d.kendali.sesi_id ? 'Belum ada pesan di sesi ini.' : 'Pesan muncul saat replay berjalan.'}</li>`;
+    return;
+  }
+  ol.innerHTML = '';
+  for (const m of d.pesan) {
+    const li = document.createElement('li');
+    li.className = `msg j-${m.jenis} s-${m.status}`;
+    if (!pertama && !sudahLihat.has(`${m.id}${m.status}`)) li.classList.add('baru');
+    sudahLihat.add(`${m.id}${m.status}`);
+    let chip;
+    const adaBot = !!d.kendali.bot;
+    if (m.status === 'TERKIRIM') chip = m.notifikasi
+      ? `<span class="chip bunyi">${ikon('bel', '')}${adaBot ? 'Terkirim dengan bunyi' : 'Notifikasi berbunyi'}</span>`
+      : `<span class="chip">${ikon('senyap', '')}${adaBot ? 'Terkirim tanpa bunyi' : 'Tanpa bunyi'}</span>`;
+    else if (m.status === 'DITAHAN') chip = `<span class="chip tahan">${ikon('tahan', '')}Ditahan</span>`;
+    else if (m.status === 'DIJADWALKAN') chip = `<span class="chip">${ikon('jadwal', '')}Terjadwal</span>`;
+    else chip = `<span class="chip gagal">${m.status === 'GAGAL' ? 'Gagal dikirim' : m.status}</span>`;
+    const isi = m.status === 'DITAHAN' ? `<p class="alasan">${ALASAN(m.alasan, d.aturan)}</p>`
+      : (m.status === 'GAGAL' ? `<p class="alasan">Alasan: ${esc(m.alasan || 'tidak diketahui')}</p>` : '') + `<p class="isi-pesan">${esc(m.isi)}</p>`;
+    const jawab = m.jawaban ? `<p class="jawab">Jawaban Bu Sri: ${JAWAB[m.jawaban] || m.jawaban}</p>`
+      : (m.jenis === 'TANYA_HUJAN' && m.status === 'TERKIRIM' && adaBot ? '<p class="jawab" style="color:var(--tinta-3)">Menunggu jawaban</p>' : '');
+    li.innerHTML = `<time>${m.jam}</time><div><p class="judul">${JENIS[m.jenis] || m.jenis} ${chip}</p>${isi}${jawab}</div>`;
+    ol.appendChild(li);
+  }
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+function gambarRekam(d) {
+  const r = d.rekam_jejak, kotak = $('kotak');
+  if (!r) { kotak.innerHTML = ''; $('rekam-teks').textContent = 'Dihitung saat replay berjalan.'; return; }
+  kotak.innerHTML = Array.from({ length: r.n }, (_, i) => `<i class="${i < r.x ? 'ya' : ''}"></i>`).join('');
+  $('rekam-teks').textContent = r.n < 5
+    ? `Baru ${r.n} peringatan siang; rekam jejak belum cukup untuk disebut di pesan.`
+    : `${r.x} dari ${r.n} peringatan berpotensi siang di ${r.n_stasiun} stasiun diikuti hujan ≥1 mm/jam dalam 3 jam. Angka ini yang disebut di pesan.`;
+}
+
+// ------------------------------------------------------------------ grafik
+function gambarGrafik(d) {
+  const g = d.grafik, svg = $('grafik');
+  $('kosong').style.display = g ? 'none' : 'grid';
+  $('judul-grafik').textContent = g ? `Uap air di atas ${g.kode} ${g.nama}` : 'Uap air di atas stasiun';
+  svg.innerHTML = '';
+  if (!g) return;
+  const W = svg.clientWidth, H = svg.clientHeight;
+  if (W < 50 || H < 50) return;
+  const m = { l: 46, r: 132, t: 30, b: 26 };
+  const sela = 22, tinggi = H - m.t - m.b - sela;
+  const hP = Math.round(tinggi * 0.72), hH = tinggi - hP;
+  const yP0 = m.t, yP1 = m.t + hP, yH0 = yP1 + sela, yH1 = yH0 + hH;
+  const t0 = ms(g.w0), t1 = ms(g.w1), tau = ms(g.tau);
+  const x = (t) => m.l + (t - t0) / (t1 - t0) * (W - m.l - m.r);
+  const [ya, yb] = g.y;
+  const y = (v) => yP1 - (v - ya) / (yb - ya) * hP;
+  const yh = (v) => yH1 - Math.min(v, g.y_hujan) / g.y_hujan * hH;
+  const slot = 30 * 60e3;
+  const xKanan = x(t1);
+
+  // latar: di luar jam jemur, masa depan
+  const lapis = el('g', {}, svg);
+  for (let t = t0; t < t1; t += slot) {
+    const j = new Date(t + WIB).getUTCHours() + new Date(t + WIB).getUTCMinutes() / 60;
+    if (j < d.aturan.jam_mulai || j >= d.aturan.jam_selesai) {
+      el('rect', { x: x(t), y: yP0, width: x(t + slot) - x(t) + 0.5, height: yH1 - yP0, fill: 'var(--malam)' }, lapis);
+    }
+  }
+  // status sebagai pita
+  const st = g.status;
+  const pita = { BERPOTENSI: 'var(--potensi-muda)', WASPADA: 'var(--waspada-muda)', TANPA_DATA: 'url(#arsir-tanpa)' };
+  for (let i = 0; i < st.length;) {               // satu persegi per rentang level yang sama (tanpa garis sambungan)
+    let j = i;
+    while (j + 1 < st.length && st[j + 1].level === st[i].level) j++;
+    const a = ms(st[i].t), b = j + 1 < st.length ? ms(st[j + 1].t) : Math.min(ms(st[j].t) + slot, tau);
+    if (pita[st[i].level] && b > a) el('rect', { x: x(a), y: yP0, width: Math.max(1, x(b) - x(a)), height: hP, fill: pita[st[i].level] }, lapis);
+    i = j + 1;
+  }
+  // jam yang belum diputar dibuat pucat
+  el('rect', { x: x(tau), y: yP0, width: Math.max(0, xKanan - x(tau)), height: yH1 - yP0, fill: '#fff', 'fill-opacity': 0.55 }, lapis);
+  // kisi dan sumbu y
+  const kisi = el('g', {}, svg);
+  const langkah = (yb - ya) > 40 ? 10 : 5;
+  for (let v = Math.ceil(ya / langkah) * langkah; v <= yb; v += langkah) {
+    el('line', { x1: m.l, x2: xKanan, y1: y(v), y2: y(v), stroke: 'var(--grid)', 'stroke-width': 1 }, kisi);
+    teks(kisi, m.l - 8, y(v) + 4, `${v}`, { 'text-anchor': 'end', fill: 'var(--tinta-3)' });
+  }
+  teks(kisi, m.l - 38, yP0 - 12, 'PWV (mm)', { fill: 'var(--tinta-2)', 'font-weight': 600 });
+  for (const v of [0, g.y_hujan / 2, g.y_hujan]) {
+    el('line', { x1: m.l, x2: xKanan, y1: yh(v), y2: yh(v), stroke: 'var(--grid)', 'stroke-width': 1 }, kisi);
+    teks(kisi, m.l - 8, yh(v) + 4, `${v}`, { 'text-anchor': 'end', fill: 'var(--tinta-3)' });
+  }
+  teks(kisi, m.l + 6, yH0 + 12, 'Hujan IMERG (mm/jam)', { fill: 'var(--tinta-2)', 'font-weight': 600 });
+  el('line', { x1: m.l, x2: xKanan, y1: yP1, y2: yP1, stroke: 'var(--sumbu)' }, kisi);
+  el('line', { x1: m.l, x2: xKanan, y1: yH1, y2: yH1, stroke: 'var(--sumbu)' }, kisi);
+  // sumbu x: tiap 3 jam WIB
+  const jamAwal = Math.ceil((t0 + WIB) / 3600e3);
+  for (let h = jamAwal; (h * 3600e3 - WIB) <= t1; h++) {
+    const t = h * 3600e3 - WIB, jw = new Date(t + WIB).getUTCHours();
+    if (jw % 3) continue;
+    el('line', { x1: x(t), x2: x(t), y1: yH1, y2: yH1 + 4, stroke: 'var(--sumbu)' }, kisi);
+    if (Math.abs(x(t) - x(tau)) < 36) continue;          // jangan bertumpuk dengan label jam sekarang
+    const dt = new Date(t + WIB);
+    const lab = jw === 0 ? `${dt.getUTCDate()} ${['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][dt.getUTCMonth()]}` : `${String(jw).padStart(2, '0')}.00`;
+    teks(kisi, x(t), yH1 + 18, lab, { 'text-anchor': 'middle', fill: jw === 0 ? 'var(--tinta)' : 'var(--tinta-3)', 'font-weight': jw === 0 ? 600 : 400 });
+  }
+
+  // garis ambang dan PWV
+  const garis = (titik, attrs) => {
+    let dd = '', naik = false;
+    for (const p of titik) {
+      if (p.v == null) { naik = false; continue; }
+      dd += `${naik ? 'L' : 'M'}${x(ms(p.t)).toFixed(1)},${y(p.v).toFixed(1)}`; naik = true;
+    }
+    if (dd) el('path', Object.assign({ d: dd, fill: 'none', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, attrs), svg);
+  };
+  garis(g.ambang1, { stroke: '#b9820a', 'stroke-width': 2, 'stroke-dasharray': '2 4' });
+  garis(g.ambang2, { stroke: 'var(--potensi)', 'stroke-width': 2, 'stroke-dasharray': '6 4' });
+  const pwv = st.map((s) => ({ t: s.t, v: s.pwv }));
+  garis(pwv, { stroke: 'var(--terpal)', 'stroke-width': 2.5 });
+
+  // hujan
+  const gh = el('g', {}, svg);
+  for (const h of g.hujan) {
+    if (h.v <= 0) continue;
+    const a = x(ms(h.t)) + 1, b = x(ms(h.t) + slot) - 1, top = yh(h.v);
+    const lebar = Math.max(1.5, b - a), tinggiB = yH1 - top;
+    const r = Math.min(3, lebar / 2, tinggiB);
+    el('path', { d: `M${a},${yH1}V${top + r}Q${a},${top} ${a + r},${top}H${a + lebar - r}Q${a + lebar},${top} ${a + lebar},${top + r}V${yH1}Z`, fill: 'var(--hujan)' }, gh);
+  }
+  for (const aw of g.awal_hujan) {
+    const xa = x(ms(aw.t));
+    el('path', { d: `M${xa - 5},${yH0 + 18}h10l-5,7z`, fill: 'var(--tinta)' }, gh);
+    teks(gh, xa + 8, yH0 + 25, `hujan mulai ${aw.jam}`, { fill: 'var(--tinta)', 'font-weight': 600, stroke: '#fff', 'stroke-width': 3, 'paint-order': 'stroke' });
+  }
+
+  // tanda pesan BERPOTENSI / AMAN_LAGI
+  const gt = el('g', {}, svg);
+  let ujungKiri = -Infinity;                       // ujung kanan label sebelumnya, supaya label tidak bertumpuk
+  g.tanda.forEach((tnd, i) => {
+    const xt = x(ms(tnd.t)), kirimOk = tnd.status === 'TERKIRIM' || tnd.status === 'DIJADWALKAN';
+    const warna = tnd.jenis === 'BERPOTENSI' ? 'var(--potensi)' : 'var(--aman)';
+    el('line', { x1: xt, x2: xt, y1: yP0 - 6, y2: yP1, stroke: warna, 'stroke-width': 1, 'stroke-opacity': 0.55 }, gt);
+    el('circle', { cx: xt, cy: yP0 - 12, r: 6.5, fill: kirimOk ? warna : '#fff', stroke: warna, 'stroke-width': 2 }, gt);
+    const xBerikut = i + 1 < g.tanda.length ? x(ms(g.tanda[i + 1].t)) - 10 : xKanan + m.r - 4;
+    const kata = tnd.jenis === 'BERPOTENSI' ? 'berpotensi' : 'aman lagi';
+    for (const lab of [`${tnd.jam} ${kata}, ${kirimOk ? 'dikirim' : 'ditahan'}`, `${tnd.jam} ${kirimOk ? 'dikirim' : 'ditahan'}`, tnd.jam]) {
+      const w = lab.length * 6.3;
+      if (xt + 11 + w < xBerikut) { teks(gt, xt + 11, yP0 - 8, lab, { fill: 'var(--tinta-2)' }); ujungKiri = xt + 11 + w; break; }
+      if (xt - 11 - w > ujungKiri + 8) { teks(gt, xt - 11, yP0 - 8, lab, { 'text-anchor': 'end', fill: 'var(--tinta-2)' }); ujungKiri = xt; break; }
+    }
+  });
+
+  // garis sekarang + label langsung di ujung garis
+  const xt = x(tau);
+  el('line', { x1: xt, x2: xt, y1: yP0, y2: yH1, stroke: 'var(--tinta)', 'stroke-width': 1.5 }, svg);
+  teks(svg, xt, yH1 + 18, jamWib(tau), { 'text-anchor': 'middle', fill: '#fff', 'font-weight': 700, latar: 'var(--tinta)' });
+
+  const akhir = (arr) => { for (let i = arr.length - 1; i >= 0; i--) if (arr[i].v != null) return arr[i]; return null; };
+  const label = [];
+  const pP = akhir(pwv), p2 = akhir(g.ambang2), p1 = akhir(g.ambang1);
+  if (pP) label.push({ yv: y(pP.v), s: `PWV ${angka(pP.v)}`, w: 'var(--terpal)', tebal: 700 });
+  if (p2) label.push({ yv: y(p2.v), s: `berpotensi ${angka(p2.v)}`, w: 'var(--potensi)', tebal: 600 });
+  if (p1) label.push({ yv: y(p1.v), s: `waspada ${angka(p1.v)}`, w: '#8a6107', tebal: 600 });
+  label.sort((a, b) => a.yv - b.yv);
+  for (let i = 1; i < label.length; i++) if (label[i].yv - label[i - 1].yv < 15) label[i].yv = label[i - 1].yv + 15;
+  const xl = Math.min(xt + 10, xKanan + 6);
+  for (const l of label) teks(svg, xl, l.yv + 4, l.s, { fill: 'var(--tinta)', 'font-weight': l.tebal, garisWarna: l.w });
+  if (pP) {
+    el('circle', { cx: x(ms(pP.t)), cy: y(pP.v), r: 5, fill: 'var(--terpal)', stroke: '#fff', 'stroke-width': 2 }, svg);
+  }
+
+  // lapisan hover
+  const tangkap = el('rect', { x: m.l, y: yP0, width: Math.max(0, xKanan - m.l), height: yH1 - yP0, fill: 'transparent' }, svg);
+  const silang = el('line', { y1: yP0, y2: yH1, stroke: 'var(--tinta-2)', 'stroke-dasharray': '3 3', visibility: 'hidden' }, svg);
+  const tunjuk = (px) => {
+    const tt = t0 + (px - m.l) / (W - m.l - m.r) * (t1 - t0);
+    if (!st.length || tt > tau + slot / 2) { sembunyi(); return; }
+    let best = st[0];
+    for (const s of st) if (Math.abs(ms(s.t) - tt) < Math.abs(ms(best.t) - tt)) best = s;
+    const tb = ms(best.t), xb = x(tb);
+    silang.setAttribute('x1', xb); silang.setAttribute('x2', xb); silang.setAttribute('visibility', 'visible');
+    const am2 = g.ambang2.find((a) => a.t === best.t), am1 = g.ambang1.find((a) => a.t === best.t);
+    const hj = g.hujan.find((h) => ms(h.t) === tb - slot);
+    const tip = $('tip');
+    tip.innerHTML = `<b>${jamWib(tb)} WIB</b><br>PWV 1 jam ${angka(best.pwv)} mm (persentil ${angka(best.persentil, 0)})` +
+      `<br>Batas berpotensi ${am2 ? angka(am2.v) : '–'} mm, waspada ${am1 ? angka(am1.v) : '–'} mm` +
+      `<br>Status ${LEVEL[best.level] ? LEVEL[best.level].ubin.toLowerCase() : best.level}` +
+      `<br>Hujan 30 menit terakhir ${hj ? angka(hj.v) + ' mm/jam' : '–'}`;
+    tip.style.display = 'block';
+    const lebar = tip.offsetWidth;
+    tip.style.left = `${xb + 14 + lebar > W ? xb - 14 - lebar : xb + 14}px`;
+    tip.style.top = `${yP0 + 6}px`;
+  };
+  const sembunyi = () => { silang.setAttribute('visibility', 'hidden'); $('tip').style.display = 'none'; };
+  tangkap.addEventListener('mousemove', (e) => { hoverX = e.offsetX; tunjuk(hoverX); });
+  tangkap.addEventListener('mouseleave', () => { hoverX = null; sembunyi(); });
+  if (hoverX != null) tunjuk(hoverX); else sembunyi();
+}
+
+function teks(parent, x, y, s, attrs = {}) {
+  const { latar, garisWarna, ...lain } = attrs;
+  if (garisWarna) {          // label langsung: potongan garis berwarna seri, teks tetap warna tinta
+    el('line', { x1: x, x2: x + 9, y1: y - 4, y2: y - 4, stroke: garisWarna, 'stroke-width': 3, 'stroke-linecap': 'round' }, parent);
+    x += 14;
+  }
+  const t = el('text', Object.assign({ x, y, 'font-size': 12, 'font-family': 'var(--teks)' }, lain), parent);
+  t.textContent = s;
+  if (latar) {
+    const bb = t.getBBox();
+    parent.insertBefore(el('rect', { x: bb.x - 6, y: bb.y - 2, width: bb.width + 12, height: bb.height + 4, rx: 4, fill: latar }), t);
+  }
+  return t;
+}
+
+// ------------------------------------------------------------------ poll
+async function muat() {
+  if (sibuk) return; sibuk = true;
+  try {
+    const q = kodePilih ? `?kode=${encodeURIComponent(kodePilih)}` : '';
+    const r = await fetch(`/api/keadaan${q}`, { cache: 'no-store' });
+    if (r.status === 503) return;
+    if (!r.ok) throw new Error(r.status);
+    data = await r.json();
+    $('putus').style.display = 'none';
+    gambarKepala(data); gambarKini(data); gambarStasiun(data); gambarPesan(data); gambarRekam(data); gambarGrafik(data);
+    pertama = false;
+  } catch (e) {
+    $('putus').style.display = 'block';
+  } finally { sibuk = false; }
+}
+let tundaUkur = null;
+window.addEventListener('resize', () => { clearTimeout(tundaUkur); tundaUkur = setTimeout(() => data && gambarGrafik(data), 120); });
+muat();
+setInterval(muat, 600);
+</script>
+</body>
+</html>

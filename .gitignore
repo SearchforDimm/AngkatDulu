@@ -1,0 +1,23 @@
+# Rahasia
+.env
+_netrc*
+.netrc
+# Data mentah (besar) – tetap di folder ANGKATDULU, bukan di repo
+*.26o
+*.26n
+*.SP3
+*.CLK
+*.gz
+*.zip
+*.rar
+*.grib
+*.atx
+# Hasil sementara
+__pycache__/
+*.db
+out26/
+tmp/
+
+# Log replay
+log_replay/
+.pytest_cache/

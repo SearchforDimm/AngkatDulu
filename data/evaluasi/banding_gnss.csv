@@ -1,0 +1,8 @@
+ukuran,GPS,GPS_GLONASS
+satelit per epoch (rata-rata 4 stasiun),8.7,14.0
+sigma ZTD median (mm),5.0,4.3
+sigma PWV median CKRG/BAKO/CLBG/CJUR (mm),0.73/0.75/0.74/0.98,0.60/0.66/0.63/0.83
+RMS selisih PWV GPS vs GPS+GLONASS CKRG/BAKO/CLBG/CJUR (mm),1.34/1.17/1.28/2.01,-
+"HSS uji silang, persentil per stasiun",0.32,0.32
+awal hujan diperingatkan 0-3 jam,20/66,16/66
+notifikasi per hari,0.46,0.44

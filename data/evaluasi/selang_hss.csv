@@ -1,0 +1,10 @@
+aturan,HSS,bawah,atas,p_lebih_baik
+Tebakan jam rawan,0.182,0.136,0.23,
+Ambang PWV ≥ 45 mm,0.255,0.17,0.342,
+PWV ≥ persentil 80 (aktif),0.323,0.229,0.407,
+"Tebakan ""kemarin hujan""",0.399,0.309,0.484,
+"PWV ≥ persentil 60 dan ""kemarin hujan""",0.421,0.326,0.508,
+selisih: PWV ≥ persentil 80 (aktif) − Tebakan jam rawan,0.141,0.045,0.232,0.998
+selisih: PWV ≥ persentil 80 (aktif) − Ambang PWV ≥ 45 mm,0.068,-0.022,0.153,0.93
+"selisih: PWV ≥ persentil 80 (aktif) − Tebakan ""kemarin hujan""",-0.077,-0.184,0.03,0.079
+"selisih: PWV ≥ persentil 60 dan ""kemarin hujan"" − Tebakan ""kemarin hujan""",0.022,-0.033,0.074,0.781

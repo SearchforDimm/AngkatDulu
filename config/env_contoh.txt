@@ -1,0 +1,2 @@
+# Salin file ini menjadi file bernama .env di folder config lalu isi. Jangan kirim .env lewat chat, jangan di-commit.
+TELEGRAM_BOT_TOKEN=
