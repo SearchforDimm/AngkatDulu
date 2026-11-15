@@ -23,9 +23,12 @@ jadi tema terang dengan bidang warna pekat, bukan tema gelap.
 
 Satu arah, mempertajam identitas yang sudah ada (semen lantai jemur, biru terpal, tinta hijau-hitam).
 
-1. **Papan status menyatu.** Jam simulasi (bidang tinta) dan status (bidang warna) menjadi satu papan.
-   Kerasnya warna mengikuti gentingnya status: AMAN hijau muda dan tenang, WASPADA amber pekat,
-   BERPOTENSI merah pekat dengan teks putih, TANPA_DATA abu berarsir. Ikon dan teks selalu ikut.
+1. **Pita status selebar layar.** Jam simulasi, status, dan rel waktu replay ada di satu pita warna dari tepi ke tepi
+   layar, tanpa kotak jam terpisah. Kerasnya warna mengikuti gentingnya status: AMAN hijau muda dan tenang,
+   WASPADA amber pekat, BERPOTENSI merah pekat dengan teks putih, TANPA_DATA abu berarsir. Ikon dan teks selalu ikut.
+   Di bawah pita ada rel waktu: awal dan akhir replay, satu takik tiap jam, dan kepala putar di jam simulasi.
+   Kepala halaman satu baris: merek, lencana Replay, keterangan bot, lalu tombol utama dan kecepatan sebagai
+   satu kendali pemutar (ikon main, jeda, atau putar ulang mengikuti fase).
 2. **Skala huruf bertingkat.** Ukuran dasar 18 px di 1920×1080, 16 px di layar sedang, 14 px di 1366×768.
    Judul status 61 px dan jam 101 px di 1920×1080. Semua angka tabular.
 3. **Grafik terbaca dari jauh.** Garis PWV ±3,8 px dan teks grafik 15 px di 1920×1080 (ikut skala huruf halaman),
@@ -40,6 +43,18 @@ Satu arah, mempertajam identitas yang sudah ada (semen lantai jemur, biru terpal
    Jawaban Bu Sri tampil sebagai gelembung balasan biru terpal di kanan. Pesan ditahan tampil sebagai kotak bergaris putus.
 7. **Kejujuran replay.** Lencana "Replay data …" pekat di kepala halaman, dan "jam simulasi" menempel di samping jam.
 8. **Yang sekunder mundur.** Ubin stasiun dan rekam jejak memakai bidang tembus di atas semen; ubin terpilih putih bergaris tinta.
+
+## Revisi bagian atas
+
+Versi pertama memakai kotak jam hitam di samping kartu status. Hasilnya terasa kaku, karena:
+
+- kotak jam mengikuti pola kartu metrik (angka besar, label kecil, bar progres);
+- lingkaran play biru di fase SIAP tampak seperti tombol padahal tidak bisa diklik;
+- kendali replay tersebar di tiga tempat (lencana, tombol dan kecepatan, kotak jam);
+- keterangan bot dua baris menggantung, dan dropdown kecepatan masih bergaya bawaan browser;
+- di laptop dengan bilah browser (1366×643) bagian atas memakan 188 px dan grafik hanya 211 px.
+
+Sekarang kepala dan pita setinggi 150 px di ukuran itu, grafik 240 px, dan ikon fase SIAP berupa panah putar ulang.
 
 ## Token
 
